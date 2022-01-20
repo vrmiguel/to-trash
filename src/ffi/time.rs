@@ -20,7 +20,7 @@ extern "C" {
 
 const BUF_SIZ: usize = 64;
 
-/// Formats a timestamp (represented as a [`Duration`] since UNIX_EPOCH) into an RFC3339 format
+/// Formats a timestamp (represented as a [`Duration`] since UNIX_EPOCH) into a YYYY-MM-DDThh:mm:ss format
 pub fn format_timestamp(now: Duration) -> Result<String> {
     let mut timestamp = now.as_secs();
 
@@ -29,7 +29,7 @@ pub fn format_timestamp(now: Duration) -> Result<String> {
 
     // Safety: time is memory-safe
     // TODO: it'd be better to call `time(NULL)` here
-    let ltime = unsafe { time(&mut timestamp as *mut u64 as *mut i64) };
+    let ltime = unsafe { time(&mut timestamp as *mut _ as *mut _) };
 
     unsafe { tzset() };
 
@@ -64,10 +64,10 @@ mod tests {
     use crate::ffi::time::format_timestamp;
 
     #[test]
-    fn rfc3339_formatting() {
+    fn formats_timestamp_into_valid_rfc3339() {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .expect("it seems that time went backwards!");
+            .unwrap();
 
         // We'll use the chrono crate to make sure that
         // our own formatting (done through libc's strftime) works

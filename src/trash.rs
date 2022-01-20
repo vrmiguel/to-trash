@@ -45,6 +45,11 @@ impl Trash {
         Ok(trash)
     }
 
+    /// The path of the `info` folder for this trash directory
+    pub fn info_path(&self) -> &Path {
+        self.info.as_path()
+    }
+
     /// Checks that the directories of this trash exist.
     ///
     /// Doesn't check for `$trash/directorysizes` since it was added in a later version of the spec
@@ -69,7 +74,7 @@ mod tests {
     use crate::error::Result;
 
     #[test]
-    fn trash_from_root() -> Result<()> {
+    fn trash_from_root_has_correct_paths() -> Result<()> {
         let trash = Trash::from_root("/home/vrmiguel/.Trash")?;
 
         assert_eq!(trash.files, "/home/vrmiguel/.Trash/files");

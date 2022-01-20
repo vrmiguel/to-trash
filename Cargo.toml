@@ -17,3 +17,8 @@ unixstring = "0.2.7"
 tempfile = "3.3.0"
 chrono = "0.4.19"
 rand = { version = "0.8.4", default-features = false, features = ["small_rng", "std"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3

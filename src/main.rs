@@ -4,6 +4,10 @@ mod fs;
 mod home_dir;
 mod light_fs;
 mod trash;
+mod info_file;
+
+#[cfg(test)]
+mod tests;
 
 use error::Result;
 use trash::Trash;
