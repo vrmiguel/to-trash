@@ -85,7 +85,7 @@ pub fn probe_mount_points() -> Result<Vec<MountPoint>> {
     probe_mount_points_in(path)
 }
 
-/// Parses the mounted file systems table given by `path` 
+/// Parses the mounted file systems table given by `path`
 pub fn probe_mount_points_in(path: &CStr) -> Result<Vec<MountPoint>> {
     let mut mount_points = BinaryHeap::new();
 
@@ -128,7 +128,9 @@ pub fn probe_mount_points_in(path: &CStr) -> Result<Vec<MountPoint>> {
 mod mount_point_probing_tests {
     use tempfile::NamedTempFile;
 
-    use std::{collections::BTreeSet, ffi::CString, io::Write, os::unix::prelude::OsStrExt, time::Duration};
+    use std::{
+        collections::BTreeSet, ffi::CString, io::Write, os::unix::prelude::OsStrExt, time::Duration,
+    };
 
     use crate::ffi::{probe_mount_points_in, MountPoint};
 
@@ -147,7 +149,6 @@ mod mount_point_probing_tests {
     #[test]
     // TODO: this test sometimes fails for weird reasons
     fn test_mount_point_probing() {
-
         // getmntent is not reentrant so this is currently needed to sort out multi-threaded weirdness
         std::thread::sleep(Duration::from_secs(1));
 

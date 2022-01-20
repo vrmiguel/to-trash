@@ -1,6 +1,6 @@
-use std::{ffi::CStr, fs::Permissions};
 use std::mem;
 use std::os::unix::fs::PermissionsExt;
+use std::{ffi::CStr, fs::Permissions};
 
 use libc::lstat;
 

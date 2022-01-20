@@ -2,9 +2,9 @@ mod error;
 mod ffi;
 mod fs;
 mod home_dir;
+mod info_file;
 mod light_fs;
 mod trash;
-mod info_file;
 
 #[cfg(test)]
 mod tests;

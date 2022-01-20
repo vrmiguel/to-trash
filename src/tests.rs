@@ -1,5 +1,4 @@
-use rand::{RngCore, SeedableRng, prelude::SmallRng};
-
+use rand::{prelude::SmallRng, RngCore, SeedableRng};
 
 pub fn dummy_bytes() -> Vec<u8> {
     let mut rng = SmallRng::from_entropy();

@@ -65,9 +65,7 @@ mod tests {
 
     #[test]
     fn formats_timestamp_into_valid_rfc3339() {
-        let now = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap();
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
 
         // We'll use the chrono crate to make sure that
         // our own formatting (done through libc's strftime) works
