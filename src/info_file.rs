@@ -81,12 +81,12 @@ mod tests {
 
     #[test]
     fn builds_info_file_path_correctly() {
-        let trash_info = Path::new("/user/dummy/.local/share/Trash/info");
+        let trash_info = Path::new("/home/dummy/.local/share/Trash/info");
         let file_name = OsStr::new("deleted-file");
 
         assert_eq!(
             build_info_file_path(file_name, trash_info),
-            Path::new("/user/dummy/.local/share/Trash/info/deleted-file.trashinfo")
+            Path::new("/home/dummy/.local/share/Trash/info/deleted-file.trashinfo")
         );
     }
 
@@ -99,8 +99,9 @@ mod tests {
 
         fs::create_dir(trash.info_path()).unwrap();
 
+        // The file to be trashed
         let file_name = OsString::from("dummy");
-        let dummy_file_path = dir_path.join(&file_name);
+        let dummy_file_path = dir_path.join("dummy");
         let mut dummy = File::create(&dummy_file_path).unwrap();
         dummy.write_all(&dummy_bytes()).unwrap();
 

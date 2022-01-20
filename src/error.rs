@@ -8,6 +8,8 @@ pub enum Error {
     TrashDirDoesNotExist(PathBuf),
     #[error("io: {0}")]
     Io(#[from] std::io::Error),
+    #[error("todo")]
+    FailedToObtainMountPoints,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

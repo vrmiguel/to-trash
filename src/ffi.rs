@@ -1,5 +1,6 @@
-mod getpwuid;
 mod time;
+mod getpwuid;
+mod mount_point;
 
 pub fn effective_user_id() -> u32 {
     // Safety: the POSIX Programmer's Manual states that
@@ -9,3 +10,4 @@ pub fn effective_user_id() -> u32 {
 
 pub use getpwuid::get_home_dir;
 pub use time::format_timestamp;
+pub use mount_point::{MountPoint, probe_mount_points, probe_mount_points_in};

@@ -27,9 +27,9 @@ impl Trash {
     pub fn from_root(root: impl AsRef<Path>) -> Result<Self> {
         let root = root.as_ref();
 
-        let files = UnixString::from_pathbuf(root.join("files"))?;
-        let directory_sizes = UnixString::from_pathbuf(root.join("directorysizes"))?;
-        let info = UnixString::from_pathbuf(root.join("info"))?;
+        let files = root.join("files").try_into()?;
+        let directory_sizes = root.join("directorysizes").try_into()?;
+        let info = root.join("info").try_into()?;
 
         Ok(Self {
             files,
@@ -60,7 +60,7 @@ impl Trash {
                 .files
                 .as_path()
                 .parent()
-                .expect("catastrophe: path ends with a root or prefix");
+                .expect("catastrophe: trash root ends with a root or prefix");
             return Err(Error::TrashDirDoesNotExist(root.to_owned()));
         }
 
