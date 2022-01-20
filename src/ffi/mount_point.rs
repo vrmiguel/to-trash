@@ -78,12 +78,14 @@ impl Ord for MountPoint {
     }
 }
 
+/// Parses `/etc/mtab` (symlink to `/proc/self/mounts`) to list currently mounted file systems`
 pub fn probe_mount_points() -> Result<Vec<MountPoint>> {
     let path = cstr!("/etc/mtab");
 
     probe_mount_points_in(path)
 }
 
+/// Parses the mounted file systems table given by `path` 
 pub fn probe_mount_points_in(path: &CStr) -> Result<Vec<MountPoint>> {
     let mut mount_points = BinaryHeap::new();
 
@@ -145,7 +147,10 @@ mod mount_point_probing_tests {
     #[test]
     // TODO: this test sometimes fails for weird reasons
     fn test_mount_point_probing() {
+
+        // getmntent is not reentrant so this is currently needed to sort out multi-threaded weirdness
         std::thread::sleep(Duration::from_secs(1));
+
         let mut temp = NamedTempFile::new().unwrap();
 
         let temp_path = temp.path();
@@ -198,16 +203,7 @@ mod mount_point_probing_tests {
 
         let expected: BTreeSet<_> = expected.into_iter().collect();
 
-        for expected_mount_point in expected.iter() {
-            let contains = mount_points.contains(expected_mount_point);
-            if !contains {
-                dbg!(expected_mount_point);
-                dbg!(&mount_points);
-            }
-            assert!(contains);
-        }
-
-        // assert_eq!(mount_points, expected);
+        assert_eq!(mount_points, expected);
     }
 }
 

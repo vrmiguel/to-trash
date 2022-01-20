@@ -1,6 +1,7 @@
 mod time;
 mod getpwuid;
 mod mount_point;
+mod lstat;
 
 pub fn effective_user_id() -> u32 {
     // Safety: the POSIX Programmer's Manual states that
