@@ -7,6 +7,10 @@ authors = ["Vinícius R. Miguel <vrmiguel99@gmail.com>",]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+uuid = { version = "0.8.2", features = ["v4"] }
 libc = "0.2.112"
 thiserror = "1.0.30"
 unixstring = "0.2.7"
+
+[dev-dependencies]
+tempfile = "3.3.0"

@@ -22,6 +22,8 @@ pub struct Trash {
 
 impl Trash {
     /// Builds a trash directory rooted at `root`.
+    ///
+    /// Does not check if the directories of this trash directory exist.
     pub fn from_root(root: impl AsRef<Path>) -> Result<Self> {
         let root = root.as_ref();
 
@@ -36,11 +38,18 @@ impl Trash {
         })
     }
 
+    /// Builds a trash directory rooted at `root` checking if the directories of this trash directory exist.
+    pub fn from_root_checked(root: impl AsRef<Path>) -> Result<Self> {
+        let trash = Self::from_root(root)?;
+        trash.assert_exists()?;
+        Ok(trash)
+    }
+
     /// Checks that the directories of this trash exist.
     ///
     /// Doesn't check for `$trash/directorysizes` since it was added in a later version of the spec
     /// so it might have been created.
-    pub fn assert_exists(&self) -> Result<()> {
+    fn assert_exists(&self) -> Result<()> {
         if !path_exists(&self.info) || !path_exists(&self.files) {
             let root = self
                 .files
