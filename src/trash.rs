@@ -1,11 +1,14 @@
-use std::{path::{Path, PathBuf}, time::{SystemTime, UNIX_EPOCH}};
+use std::{
+    path::{Path, PathBuf},
+    time::{SystemTime, UNIX_EPOCH},
+};
 
 use unixstring::UnixString;
 
 use crate::{
     error::{Error, Result},
     fs::build_unique_file_name,
-    info_file::{build_info_file_path, write_info_file},
+    info_file::write_info_file,
     light_fs::path_exists,
 };
 
@@ -13,13 +16,13 @@ use crate::{
 /// A trash directory contains three subdirectories, named `info`, `directorysizes` and `files`.
 pub struct Trash {
     /// The $trash/files directory contains the files and directories that were trashed. When a file or directory is trashed, it must be moved into this directory.
-    files: UnixString,
+    pub files: UnixString,
     /// The $trash/directorysizes directory is a cache of the sizes of the directories that were trashed into this trash da cache of the sizes of the directories that were trashed into this trash directory. Individual trashed files are not present in this cache, since their size can be determined with a call to stat().irectory.
     /// Individual trashed files are not present in this cache, since their size can be determined with a call to stat().
-    directory_sizes: UnixString,
+    pub directory_sizes: UnixString,
     /// The $trash/info directory contains an “information file” for every file and directory in $trash/files.
     /// This file must have exactly the same name as the file or directory in $trash/files, plus the extension “.trashinfo”
-    info: UnixString,
+    pub info: UnixString,
 }
 
 impl Trash {
@@ -74,7 +77,7 @@ impl Trash {
     ///
     /// In case of success, returns the name of the trashed file
     /// exactly as sent to `TRASH/files`.
-    /// 
+    ///
     /// # Note:
     ///
     /// From the FreeDesktop Trash spec 1.0:
@@ -109,7 +112,6 @@ impl Trash {
         } else {
             file_name.to_owned()
         };
-
 
         // The path of the trashed file in `$trash/files`
         let trash_file_path = self.files.as_path().join(&file_name);

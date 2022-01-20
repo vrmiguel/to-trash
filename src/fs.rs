@@ -8,7 +8,7 @@ use crate::error::Result;
 /// this function appends to `path` an UUID in order to make its path unique.
 ///
 /// This is needed whenever we want to send a file to $trash/files but it already contains a file with the same path.
-pub fn build_unique_file_name(path: impl AsRef<Path>, dir: impl AsRef<Path>) -> OsString {
+pub fn build_unique_file_name(path: impl AsRef<Path>, _dir: impl AsRef<Path>) -> OsString {
     // debug_assert!(dir.join(path).exists());
 
     let uuid = Uuid::new_v4().to_string();
