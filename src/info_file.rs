@@ -41,12 +41,14 @@ pub fn build_info_file_path(file_name: &OsStr, trash_info_path: &Path) -> PathBu
 /// The trash used is given by `trash`.
 ///
 /// The deletion timestamp is given by `deletion_date`, a [`Duration`] starting in UNIX_EPOCH.
+///
+/// Returns the path of the created info file, if successful.
 pub fn write_info_file(
     original_path: &Path,
     file_name: &OsStr,
     trash: &Trash,
     deletion_date: Duration,
-) -> Result<()> {
+) -> Result<PathBuf> {
     // The date and time are to be in the YYYY-MM-DDThh:mm:ss format.
     // The time zone should be the user's (or filesystem's) local time.
     let rfc3339 = ffi::format_timestamp(deletion_date)?;
@@ -57,7 +59,7 @@ pub fn write_info_file(
     // This file MUST have exactly the same name as the file or directory in $trash/files, plus the extension “.trashinfo”.
     let info_file_path = build_info_file_path(file_name, info_path);
 
-    let mut info_file = File::create(info_file_path)?;
+    let mut info_file = File::create(&info_file_path)?;
 
     writeln!(info_file, "[Trash Info]")?;
     // TODO: is this correct when `original_path` isn't valid UTF-8?
@@ -66,7 +68,7 @@ pub fn write_info_file(
 
     info_file.sync_all()?;
 
-    Ok(())
+    Ok(info_file_path)
 }
 
 #[cfg(test)]

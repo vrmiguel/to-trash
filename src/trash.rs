@@ -1,9 +1,11 @@
-use std::path::Path;
+use std::{path::{Path, PathBuf}, time::{SystemTime, UNIX_EPOCH}};
 
 use unixstring::UnixString;
 
 use crate::{
     error::{Error, Result},
+    fs::build_unique_file_name,
+    info_file::{build_info_file_path, write_info_file},
     light_fs::path_exists,
 };
 
@@ -65,6 +67,70 @@ impl Trash {
         }
 
         Ok(())
+    }
+
+    /// Sends the file given by `path` to the given trash structure
+    ///
+    ///
+    /// In case of success, returns the name of the trashed file
+    /// exactly as sent to `TRASH/files`.
+    /// 
+    /// # Note:
+    ///
+    /// From the FreeDesktop Trash spec 1.0:
+    ///
+    ///```
+    ///   When trashing a file or directory, the implementation
+    ///   MUST create the corresponding file in $trash/info first
+    ///```
+    /// Our implementation respects this by calling `build_info_file` before `move_file`
+    pub fn send_to_trash(&self, to_be_removed: &Path) -> Result<PathBuf> {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?;
+
+        if to_be_removed.is_dir() {
+            // TODO: add an entry to directorysizes!
+        }
+
+        // The name of the file to be removed
+        let file_name = to_be_removed
+            .file_name()
+            .ok_or_else(|| Error::FailedToObtainFileName(to_be_removed.into()))?;
+
+        // Where the file will be sent to once trashed
+        let file_in_trash = self.files.as_path().join(&file_name);
+
+        // According to the trash-spec 1.0 states that, a file in the trash
+        // must not be overwritten by a newer file with the same filename.
+        //
+        // For this reason, we'll make a new unique filename for the file we're deleting if this
+        // occurs
+        let file_name = if file_in_trash.exists() {
+            build_unique_file_name(&file_name, &self.files.as_path())
+        } else {
+            file_name.to_owned()
+        };
+
+
+        // The path of the trashed file in `$trash/files`
+        let trash_file_path = self.files.as_path().join(&file_name);
+
+        // Writes the info file for the file being trashed in `$trash/info`.
+        // This must be done before deleting the original file, as per the spec.
+        let info_file_path = write_info_file(&to_be_removed, &file_name, &self, now)?;
+
+        // Send the file being trashed... to the trash
+        if let Err(err) = crate::fs::move_file(to_be_removed, &*trash_file_path) {
+            // Remove the info file if moving the file fails
+            std::fs::remove_file(info_file_path)?;
+            eprintln!(
+                "failed to move {} to {}",
+                to_be_removed.display(),
+                trash_file_path.display()
+            );
+            return Err(err);
+        }
+
+        Ok(file_name.into())
     }
 }
 
