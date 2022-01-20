@@ -9,6 +9,7 @@ pub fn effective_user_id() -> u32 {
     unsafe { libc::geteuid() }
 }
 
-pub use getpwuid::get_home_dir;
+pub use lstat::Lstat;
 pub use time::format_timestamp;
+pub use getpwuid::get_home_dir;
 pub use mount_point::{MountPoint, probe_mount_points, probe_mount_points_in};

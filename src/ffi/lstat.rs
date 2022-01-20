@@ -3,7 +3,6 @@ use std::mem;
 use std::os::unix::fs::PermissionsExt;
 
 use libc::lstat;
-use unixstring::UnixString;
 
 use crate::error::{Error, Result};
 
