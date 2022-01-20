@@ -4,10 +4,9 @@ use uuid::Uuid;
 
 use crate::error::Result;
 
-
 /// Assuming that a file with path `path` exists in the directory `dir`,
 /// this function appends to `path` an UUID in order to make its path unique.
-/// 
+///
 /// This is needed whenever we want to send a file to $trash/files but it already contains a file with the same path.
 pub fn build_unique_file_name(path: &Path, dir: &Path) -> OsString {
     debug_assert!(dir.join(path).exists());
@@ -19,7 +18,7 @@ pub fn build_unique_file_name(path: &Path, dir: &Path) -> OsString {
 }
 
 /// Tries to rename a file from `from` to `to`.
-/// 
+///
 /// If renaming fails, copies the contents of the file to the new path and removes the original source.
 pub fn move_file(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<()> {
     // TODO: add rename to light-fs and switch these arguments to impl AsRef<CStr>
@@ -32,13 +31,13 @@ pub fn move_file(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<()> {
     Ok(())
 }
 
-
 /// Will copy the contents of `from` into `to`.
-/// 
+///
 /// The file in `from` is then deleted.
 fn copy_and_remove(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<()> {
-    fs::copy(from.as_ref(), to.as_ref())?;
-    if from.as_ref().is_dir() {
+    let (from, to) = (from.as_ref(), to.as_ref());
+    fs::copy(from, to)?;
+    if from.is_dir() {
         fs::remove_dir_all(from)?;
     } else {
         fs::remove_file(from)?;
@@ -46,3 +45,5 @@ fn copy_and_remove(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<()> {
 
     Ok(())
 }
+
+// TODO: copy over tests from old to-trash implementation

@@ -1,9 +1,9 @@
 mod error;
 mod ffi;
+mod fs;
 mod home_dir;
 mod light_fs;
 mod trash;
-mod fs;
 
 use error::Result;
 use trash::Trash;

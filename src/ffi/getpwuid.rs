@@ -5,6 +5,7 @@ use unixstring::UnixString;
 
 use super::effective_user_id;
 
+/// Looks up the password entry to find the user's username
 pub fn get_home_dir() -> Option<UnixString> {
     let mut buf = [0; 2048];
     let mut result = ptr::null_mut();
@@ -16,8 +17,6 @@ pub fn get_home_dir() -> Option<UnixString> {
         unsafe { getpwuid_r(uid, &mut passwd, buf.as_mut_ptr(), buf.len(), &mut result) };
 
     if getpwuid_r_code == 0 && !result.is_null() {
-        // If getpwuid_r succeeded, let's get the username from it
-
         let home_dir = unsafe { UnixString::from_ptr(passwd.pw_dir) };
 
         return Some(home_dir);
