@@ -24,5 +24,5 @@ Some of those are my interpretation of the spec. and not necessarily verbatim to
 * [ ] If a `$topdir/.Trash` does not exist or has not passed the checks:
     * [ ] If a `$topdir/.Trash-$uid` directory does not exist, the implementation must immediately create it, without any warnings or delays for the user.
 
-Feel free to open an issue if you feel like `tt` is lacking 
+Feel free to open an issue if you feel like `tt` is lacking any important features.
 
