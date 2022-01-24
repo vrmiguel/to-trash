@@ -14,6 +14,10 @@ pub enum Error {
     SystemTime(#[from] std::time::SystemTimeError),
     #[error("Failed to obtain filename of path {0}")]
     FailedToObtainFileName(PathBuf),
+    #[error("Failed to obtain string from a sequence of bytes")]
+    StringFromBytes,
+    #[error("Invalid UTF-8: {0}")]
+    Utf8(#[from] std::str::Utf8Error),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

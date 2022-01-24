@@ -16,7 +16,6 @@ pub struct MountPoint {
     pub fs_path_prefix: PathBuf,
 }
 
-#[allow(dead_code)]
 impl MountPoint {
     pub fn is_root(&self) -> bool {
         self.fs_path_prefix == Path::new("/")

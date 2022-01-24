@@ -22,8 +22,9 @@ impl Lstat {
         self.inner.st_mode
     }
 
-    pub const fn size(&self) -> i64 {
-        self.inner.st_size
+    /// Total size, in bytes
+    pub const fn size(&self) -> u64 {
+        self.inner.st_size as u64
     }
 
     pub const fn block_size(&self) -> i64 {

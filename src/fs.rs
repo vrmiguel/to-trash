@@ -1,8 +1,13 @@
-use std::{ffi::OsString, fs, path::Path};
+use std::{
+    ffi::OsString,
+    fs::{self, File, OpenOptions},
+    path::{Path, PathBuf},
+};
 
+use unixstring::UnixString;
 use uuid::Uuid;
 
-use crate::error::Result;
+use crate::{error::Result, ffi::Lstat, light_fs::{path_is_directory, path_is_regular_file}};
 
 /// Assuming that a file with path `path` exists in the directory `dir`,
 /// this function appends to `path` an UUID in order to make its path unique.
@@ -46,7 +51,48 @@ fn copy_and_remove(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<()> {
     Ok(())
 }
 
-// TODO: copy over tests from old to-trash implementation
+/// Makes a copy of the file located in `path`.
+/// Returns the path of the newly created file, as well as a
+/// reference to the file ready for appending.
+pub fn make_copy(path: &Path) -> Result<(PathBuf, File)> {
+    let uuid = uuid::Uuid::new_v4();
+    let mut copy_path = path.as_os_str().to_owned();
+    copy_path.push(uuid.to_string());
+
+    // Copy the file to our new path
+    fs::copy(path, &copy_path)?;
+
+    let file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(&copy_path)?;
+
+    Ok((copy_path.into(), file))
+}
+
+/// Scans a directory recursively adding up the total of bytes it contains.
+///
+/// Symlinks found are not followed.
+pub fn directory_size(path: UnixString) -> Result<u64> {
+    let mut size = 0;
+
+    let lstat_size = |path: &UnixString| -> crate::Result<u64> { Ok(Lstat::lstat(path)?.size()) };
+
+    if path.as_path().is_dir() {
+        for entry in fs::read_dir(&path)? {
+            let entry: UnixString = entry?.path().try_into()?;
+            if path_is_regular_file(&entry) {
+                size += lstat_size(&entry)?;
+            } else if path_is_directory(&entry) {
+                size += directory_size(entry)?;
+            }
+        }
+    } else {
+        size = lstat_size(&path)?;
+    }
+
+    Ok(size)
+}
 
 #[cfg(test)]
 mod tests {

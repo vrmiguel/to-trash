@@ -6,8 +6,9 @@ use std::{
 use unixstring::UnixString;
 
 use crate::{
+    directorysizes::update_directory_sizes,
     error::{Error, Result},
-    fs::build_unique_file_name,
+    fs::{build_unique_file_name, directory_size},
     info_file::write_info_file,
     light_fs::path_exists,
 };
@@ -17,8 +18,8 @@ use crate::{
 pub struct Trash {
     /// The $trash/files directory contains the files and directories that were trashed. When a file or directory is trashed, it must be moved into this directory.
     pub files: UnixString,
-    /// The $trash/directorysizes directory is a cache of the sizes of the directories that were trashed into this trash da cache of the sizes of the directories that were trashed into this trash directory. Individual trashed files are not present in this cache, since their size can be determined with a call to stat().irectory.
-    /// Individual trashed files are not present in this cache, since their size can be determined with a call to stat().
+    /// The $trash/directorysizes directory is a cache of the sizes of the directories that were trashed
+    /// in this trash directory. Individual trashed files are not present in this cache, since their size can be determined with a call to stat().
     pub directory_sizes: UnixString,
     /// The $trash/info directory contains an “information file” for every file and directory in $trash/files.
     /// This file must have exactly the same name as the file or directory in $trash/files, plus the extension “.trashinfo”
@@ -90,9 +91,13 @@ impl Trash {
     pub fn send_to_trash(&self, to_be_removed: &Path) -> Result<PathBuf> {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?;
 
-        if to_be_removed.is_dir() {
-            // TODO: add an entry to directorysizes!
-        }
+        // If we're trashing a directory, we must calculate its size
+        let directory_size = if to_be_removed.is_dir() {
+            let unx = to_be_removed.to_owned().try_into()?;
+            Some(directory_size(unx)?)
+        } else {
+            None
+        };
 
         // The name of the file to be removed
         let file_name = to_be_removed
@@ -130,6 +135,20 @@ impl Trash {
                 trash_file_path.display()
             );
             return Err(err);
+        }
+
+        // If we just trashed a directory, update `$trash/directorysizes`.
+        if let Some(directory_size) = directory_size {
+            update_directory_sizes(
+                // The trash the directory was sent to
+                &self,
+                // The size of this directory, in bytes
+                directory_size,
+                // The name of this directory in $trash/files
+                &file_name,
+                // When this directory was trashed
+                now,
+            )?;
         }
 
         Ok(file_name.into())

@@ -1,3 +1,4 @@
+mod directorysizes;
 mod error;
 mod ffi;
 mod fs;
@@ -11,7 +12,6 @@ mod tests;
 
 use std::{
     env,
-    os::unix::net::UnixStream,
     path::{Path, PathBuf},
 };
 
@@ -51,7 +51,6 @@ fn main() {
 fn run() -> Result<()> {
     for file in env::args_os().skip(1) {
         let file = PathBuf::from(file).canonicalize()?;
-
         if file.starts_with("/home") {
             // The file is located at home so we'll send it to the home trash
             HOME_TRASH.send_to_trash(&file)?;
