@@ -1,9 +1,9 @@
 use std::ffi::OsStr;
-use std::fs;
 use std::io::Write;
 use std::os::unix::prelude::OsStrExt;
 use std::time::Duration;
 
+use fs_err as fs;
 use percent_encoding::{percent_encode, NON_ALPHANUMERIC};
 
 use crate::fs::make_copy;
@@ -36,13 +36,13 @@ pub fn update_directory_sizes(
     let (file_name, mut file) = make_copy(trash.directory_sizes.as_path())?;
 
     // Append to temp file
-    write!(file, "{directory_size} {deletion_time} {percent_encoded}")?;
+    writeln!(file, "{directory_size} {deletion_time} {percent_encoded}")?;
 
     // Atomic rename to actual directorysizes file
     fs::rename(&file_name, trash.directory_sizes.as_path())?;
 
     // Remove temp file
-    fs::remove_file(file_name)?;
+    // fs::remove_file(file_name)?;
 
     Ok(())
 }

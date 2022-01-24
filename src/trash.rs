@@ -3,6 +3,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
+use fs_err as fs;
 use unixstring::UnixString;
 
 use crate::{
@@ -128,7 +129,7 @@ impl Trash {
         // Send the file being trashed... to the trash
         if let Err(err) = crate::fs::move_file(to_be_removed, &*trash_file_path) {
             // Remove the info file if moving the file fails
-            std::fs::remove_file(info_file_path)?;
+            fs::remove_file(info_file_path)?;
             eprintln!(
                 "failed to move {} to {}",
                 to_be_removed.display(),

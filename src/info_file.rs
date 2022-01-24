@@ -9,10 +9,10 @@
 //!    * The key “DeletionDate” contains the date and time when the file/directory was trashed. The date and time are to be in the YYYY-MM-DDThh:mm:ss format (see RFC 3339). The time zone should be the user's (or filesystem's) local time. The value type for this key is “string”.
 
 use std::ffi::OsStr;
-use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
+use fs_err::File;
 use crate::error::Result;
 use crate::ffi;
 use crate::trash::Trash;
