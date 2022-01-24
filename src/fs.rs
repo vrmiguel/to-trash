@@ -1,13 +1,14 @@
 use std::{
     ffi::OsString,
-    fs::{self, File, OpenOptions},
-    path::{Path, PathBuf},
+    fs::{self},
+    path::Path,
 };
 
+use tempfile::NamedTempFile;
 use unixstring::UnixString;
 use uuid::Uuid;
 
-use crate::{error::Result, ffi::Lstat, light_fs::{path_is_directory, path_is_regular_file}};
+use crate::{error::Result, ffi::Lstat, light_fs::{path_is_directory, path_is_regular_file}, trash::Trash};
 
 /// Assuming that a file with path `path` exists in the directory `dir`,
 /// this function appends to `path` an UUID in order to make its path unique.
@@ -51,23 +52,19 @@ fn copy_and_remove(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<()> {
     Ok(())
 }
 
-/// Makes a copy of the file located in `path`.
-/// Returns the path of the newly created file, as well as a
-/// reference to the file ready for appending.
-pub fn make_copy(path: &Path) -> Result<(PathBuf, File)> {
-    let uuid = uuid::Uuid::new_v4();
-    let mut copy_path = path.as_os_str().to_owned();
-    copy_path.push(uuid.to_string());
+/// Makes a temporary copy of `$trash/directorysizes`.
+pub fn copy_directorysizes(path: &Trash) -> Result<NamedTempFile> {
+    let temp = NamedTempFile::new_in(path.files.as_path())?;
 
-    // Copy the file to our new path
-    fs::copy(path, &copy_path)?;
+    // Copy the directorysizes to our new path
+    fs::copy(path.directory_sizes.as_path(), temp.path())?;
 
-    let file = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(&copy_path)?;
+    // let file = OpenOptions::new()
+    //     .write(true)
+    //     .append(true)
+    //     .open(&copy_path)?;
 
-    Ok((copy_path.into(), file))
+    Ok(temp)
 }
 
 /// Scans a directory recursively adding up the total of bytes it contains.

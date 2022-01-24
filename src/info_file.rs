@@ -12,10 +12,10 @@ use std::ffi::OsStr;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
-use fs_err::File;
 use crate::error::Result;
 use crate::ffi;
 use crate::trash::Trash;
+use fs_err::File;
 use std::time::Duration;
 
 /// Builds the name of the info file for a file being trashed.

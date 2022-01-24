@@ -6,7 +6,7 @@ use std::time::Duration;
 use fs_err as fs;
 use percent_encoding::{percent_encode, NON_ALPHANUMERIC};
 
-use crate::fs::make_copy;
+use crate::fs::copy_directorysizes;
 use crate::trash::Trash;
 
 /// Updates the $trash/directorysizes file with the information
@@ -33,13 +33,13 @@ pub fn update_directory_sizes(
     let deletion_time = deletion_time.as_secs();
 
     // Copy $trash/directorysizes to temp file
-    let (file_name, mut file) = make_copy(trash.directory_sizes.as_path())?;
+    let mut temp = copy_directorysizes(&trash)?;
 
     // Append to temp file
-    writeln!(file, "{directory_size} {deletion_time} {percent_encoded}")?;
+    writeln!(temp.as_file_mut(), "{directory_size} {deletion_time} {percent_encoded}")?;
 
     // Atomic rename to actual directorysizes file
-    fs::rename(&file_name, trash.directory_sizes.as_path())?;
+    fs::rename(temp.path(), trash.directory_sizes.as_path())?;
 
     // Remove temp file
     // fs::remove_file(file_name)?;
