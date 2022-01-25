@@ -75,7 +75,7 @@ pub fn directory_size(path: UnixString) -> Result<u64> {
 
     let lstat_size = |path: &UnixString| -> crate::Result<u64> { Ok(Lstat::lstat(path)?.size()) };
 
-    if path.as_path().is_dir() {
+    if path_is_directory(&path) {
         for entry in fs::read_dir(&path)? {
             let entry: UnixString = entry?.path().try_into()?;
             if path_is_regular_file(&entry) {
