@@ -98,7 +98,6 @@ mod tests {
             percent_encode(trashed_file_name.as_os_str().as_bytes(), NON_ALPHANUMERIC);
 
         let directorysizes = fs::read_to_string(&trash.directory_sizes)?;
-        dbg!(&directorysizes);
         let mut lines = directorysizes.lines();
 
         // Must not have overwritten the first line

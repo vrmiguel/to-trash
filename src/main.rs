@@ -21,6 +21,7 @@ pub use error::{Error, Result};
 use trash::Trash;
 use unixstring::UnixString;
 
+use crate::ffi::real_user_id;
 use crate::ffi::MountPoint;
 
 lazy_static! {
@@ -55,9 +56,44 @@ fn run() -> Result<()> {
             // The file is located at home so we'll send it to the home trash
             HOME_TRASH.send_to_trash(&file)?;
         } else {
-            let mount_point = find_mount_point_of_file(&file)?;
+            trash_file_in_other_mount_point(file)?;
         }
     }
+
+    Ok(())
+}
+
+/// Tries to trash a file (given by `path` which is located in a non-home mount point)
+fn trash_file_in_other_mount_point(path: PathBuf) -> Result<()> {
+    // Try to find the mount point of this file
+    let mount_point = find_mount_point_of_file(&path)?;
+    let topdir = &mount_point.fs_path_prefix;
+
+    // Check if a valid trash already exists in this mount point
+    if let Ok(trash) = Trash::from_root_checked(topdir) {
+        trash.send_to_trash(&path)?;
+        return Ok(());
+    };
+
+    // If a $topdir/.Trash does not exist or has not passed the checks, check if `$topdir/.Trash-$uid` exists.
+    // If a $topdir/.Trash-$uid directory does not exist, the implementation must immediately create it, without any warnings or delays for the user.
+    // TODO: should we use the effective user ID here?
+    let uid = real_user_id();
+
+    let trash_uid_path = topdir.join(format!(".Trash-{}", uid));
+
+    let trash = if let Ok(trash) = Trash::from_root_checked(&trash_uid_path) {
+        trash
+    } else {
+        let trash = Trash::from_root(&trash_uid_path)?;
+        fs_err::create_dir(&trash.info)?;
+        fs_err::create_dir(&trash.files)?;
+        fs_err::File::create(&trash.directory_sizes)?;
+
+        trash
+    };
+
+    trash.send_to_trash(&path)?;
 
     Ok(())
 }

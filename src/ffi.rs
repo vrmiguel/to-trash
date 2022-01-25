@@ -9,6 +9,12 @@ pub fn effective_user_id() -> u32 {
     unsafe { libc::geteuid() }
 }
 
+pub fn real_user_id() -> u32 {
+    // Safety: the POSIX Programmer's Manual states that
+    // getuid will always be successful.
+    unsafe { libc::getuid() }
+}
+
 pub use getpwuid::get_home_dir;
 pub use lstat::Lstat;
 pub use mount_point::{probe_mount_points, probe_mount_points_in, MountPoint};

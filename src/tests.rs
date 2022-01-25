@@ -36,8 +36,7 @@ fn sends_file_to_trash() -> crate::Result<()> {
 
     // The file should now be in the trash
     let new_path = trash.files.as_path().join("dummy");
-    dbg!(&new_path);
-
+    
     // The new file (now in the trash) should now exist
     assert!(new_path.exists());
 

@@ -79,13 +79,13 @@ pub fn directory_size(path: UnixString) -> Result<u64> {
         for entry in fs::read_dir(&path)? {
             let entry: UnixString = entry?.path().try_into()?;
             if path_is_regular_file(&entry) {
-                dbg!(size += lstat_size(&entry)?);
+                size += lstat_size(&entry)?;
             } else if path_is_directory(&entry) {
                 size += directory_size(entry)?;
             }
         }
     } else {
-        dbg!(size = lstat_size(&path)?);
+        size = lstat_size(&path)?;
     }
 
     Ok(size)

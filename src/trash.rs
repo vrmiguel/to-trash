@@ -153,6 +153,12 @@ impl Trash {
             )?;
         }
 
+        println!(
+            "tt: successfully sent {} to {}.",
+            to_be_removed.display(),
+            self.files.as_path().display()
+        );
+
         Ok(file_name.into())
     }
 }
