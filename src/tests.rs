@@ -21,7 +21,7 @@ fn sends_file_to_trash() -> crate::Result<()> {
     let dir_path = dir.path();
     let trash = Trash::from_root(dir_path)?;
 
-    std::fs::create_dir(&trash.directory_sizes)?;
+    std::fs::File::create(&trash.directory_sizes)?;
     std::fs::create_dir(&trash.files)?;
     std::fs::create_dir(&trash.info)?;
 

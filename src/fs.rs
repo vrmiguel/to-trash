@@ -8,7 +8,12 @@ use tempfile::NamedTempFile;
 use unixstring::UnixString;
 use uuid::Uuid;
 
-use crate::{error::Result, ffi::Lstat, light_fs::{path_is_directory, path_is_regular_file}, trash::Trash};
+use crate::{
+    error::Result,
+    ffi::Lstat,
+    light_fs::{path_is_directory, path_is_regular_file},
+    trash::Trash,
+};
 
 /// Assuming that a file with path `path` exists in the directory `dir`,
 /// this function appends to `path` an UUID in order to make its path unique.
@@ -59,11 +64,6 @@ pub fn copy_directorysizes(path: &Trash) -> Result<NamedTempFile> {
     // Copy the directorysizes to our new path
     fs::copy(path.directory_sizes.as_path(), temp.path())?;
 
-    // let file = OpenOptions::new()
-    //     .write(true)
-    //     .append(true)
-    //     .open(&copy_path)?;
-
     Ok(temp)
 }
 
@@ -79,13 +79,13 @@ pub fn directory_size(path: UnixString) -> Result<u64> {
         for entry in fs::read_dir(&path)? {
             let entry: UnixString = entry?.path().try_into()?;
             if path_is_regular_file(&entry) {
-                size += lstat_size(&entry)?;
+                dbg!(size += lstat_size(&entry)?);
             } else if path_is_directory(&entry) {
                 size += directory_size(entry)?;
             }
         }
     } else {
-        size = lstat_size(&path)?;
+        dbg!(size = lstat_size(&path)?);
     }
 
     Ok(size)

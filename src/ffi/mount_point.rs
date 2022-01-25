@@ -110,7 +110,7 @@ pub fn probe_mount_points_in(path: &CStr) -> Result<Vec<MountPoint>> {
         let fs_dir = unsafe { UnixString::from_ptr(fs_dir) };
 
         let mount_point = MountPoint {
-            fs_name: fs_name.into_string_lossy().into(),
+            fs_name: fs_name.into_string_lossy(),
             fs_path_prefix: fs_dir.into(),
         };
         mount_points.push(Reverse(mount_point));

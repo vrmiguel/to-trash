@@ -90,6 +90,7 @@ impl Trash {
     ///```
     /// Our implementation respects this by calling `build_info_file` before `move_file`
     pub fn send_to_trash(&self, to_be_removed: &Path) -> Result<PathBuf> {
+        // How much time has passed since Jan 1st 1970?
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?;
 
         // If we're trashing a directory, we must calculate its size
@@ -124,7 +125,7 @@ impl Trash {
 
         // Writes the info file for the file being trashed in `$trash/info`.
         // This must be done before deleting the original file, as per the spec.
-        let info_file_path = write_info_file(&to_be_removed, &file_name, &self, now)?;
+        let info_file_path = write_info_file(&to_be_removed, &file_name, self, now)?;
 
         // Send the file being trashed... to the trash
         if let Err(err) = crate::fs::move_file(to_be_removed, &*trash_file_path) {
@@ -142,7 +143,7 @@ impl Trash {
         if let Some(directory_size) = directory_size {
             update_directory_sizes(
                 // The trash the directory was sent to
-                &self,
+                self,
                 // The size of this directory, in bytes
                 directory_size,
                 // The name of this directory in $trash/files
