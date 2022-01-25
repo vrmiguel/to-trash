@@ -1,6 +1,22 @@
 # `to-trash` 🚮
 
-`to-trash` (`tt` for short) is a fast, small, and hopefully FreeDesktop-compliant file trasher for Linux.
+`to-trash` (`tt` for short) is a fast, small, and hopefully FreeDesktop-compliant file trasher for Linux (or other Unix-like systems which comply to this standard).
+
+## Building
+
+Requisites:
+   * [Rust 1.58+](https://rustup.rs/)
+
+```
+git clone https://github.com/vrmiguel/to-trash
+cargo install --path to-trash
+```
+
+## Usage
+
+```
+Usage: tt [files to be trashed]
+```
 
 ## Compliance
 
